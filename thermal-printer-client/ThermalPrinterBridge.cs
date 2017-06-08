@@ -83,8 +83,7 @@ namespace thermal_printer_client
 
                     if (targetPortFound)
                     {
-                        Console.WriteLine("\n\npress ENTER to exit");
-                        Console.ReadLine(); //wait for user to press any button -- Temporary
+                        Console.WriteLine("\n\npExiting.");
                     }
                     else
                     {
