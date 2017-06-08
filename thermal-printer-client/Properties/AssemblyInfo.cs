@@ -5,13 +5,13 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("thermal-printer-client")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Datecs LP50 Client")]
+[assembly: AssemblyDescription("Utility to print to LP50 from a text file with variables to a target form")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("thermal-printer-client")]
-[assembly: AssemblyCopyright("Copyright ©  2017")]
-[assembly: AssemblyTrademark("Einsroot Limited")]
+[assembly: AssemblyCopyright("Copyleft ©  2017")]
+[assembly: AssemblyTrademark("Free License")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible

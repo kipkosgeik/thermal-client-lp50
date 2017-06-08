@@ -113,7 +113,7 @@ namespace thermal_printer_client
             {
                 List<string> values = new List<string>();
 
-                FileStream f = new FileStream(filePath, FileMode.Open);
+                FileStream f = new FileStream(filePath, FileMode.Open, FileAccess.Read);
                 streamReader = new StreamReader(f);
 
                 CsvConfiguration config = new CsvConfiguration();
