@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.26430.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "thermal-printer-client", "thermal-printer-client\thermal-printer-client.csproj", "{F7D1BB25-C659-4E3B-BEED-3BB7ED27571B}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "thermal-printer-client-setup", "thermal-printer-client-setup\thermal-printer-client-setup.vdproj", "{A5058F25-587A-414E-8983-5E32E3A6FE1F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,8 @@ Global
 		{F7D1BB25-C659-4E3B-BEED-3BB7ED27571B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F7D1BB25-C659-4E3B-BEED-3BB7ED27571B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F7D1BB25-C659-4E3B-BEED-3BB7ED27571B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5058F25-587A-414E-8983-5E32E3A6FE1F}.Debug|Any CPU.ActiveCfg = Debug
+		{A5058F25-587A-414E-8983-5E32E3A6FE1F}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
