@@ -1,12 +1,10 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Ports;
 using System.Text;
+using System.IO.Ports;
 
-namespace thermal_printer_client
+
+namespace ThermalPrinter
 {
 
     /// <summary>
@@ -19,7 +17,7 @@ namespace thermal_printer_client
     /// <code>FORM_NAME,Variable_count,V00,V01,..,Vnn</code>
     /// <para>Note that graphics are supposed to be preloaded in the printer. The DATECS label editor is best for this task.</para>
     /// </summary>
-    class ThermalPrinterBridge
+    class Program
     {
         private const int PORT_READ_TIMEOUT = 10000;
         private const int PORT_WRITE_TIMEOUT = 10000;
@@ -28,6 +26,7 @@ namespace thermal_printer_client
         {
             try
             {
+                Console.WriteLine("Starting program...");
 
                 if (args.Length == 0)
                 {
@@ -36,11 +35,11 @@ namespace thermal_printer_client
                 else
                 {
 
-                    ThermalPrinterBridge bridge = new ThermalPrinterBridge();
+                    Program bridge = new Program();
                     Console.WriteLine("Reading file {0}...", args[0]);
                     List<string> variables = bridge.ReadValues(args[0]);
                     Console.WriteLine("Acquired data: {0}", string.Join(" ", variables.ToArray()));
-                    string LP_50_PORT = Properties.Settings.Default.serialPort; //fetch port from config
+                    string LP_50_PORT = "COM8"; //fetch port from config
                     Console.WriteLine("Configured port is {0}", LP_50_PORT);
                     List<String> ports = bridge.getAllPorts();
                     Console.WriteLine("Enumerating available ports...");
@@ -56,6 +55,7 @@ namespace thermal_printer_client
                                 serialPort = new SerialPort(port);
                                 if (serialPort.IsOpen == false)
                                 { //if not open, open the port
+                                    Console.WriteLine("Openning the port...");
                                     serialPort.Open();
                                     serialPort.ReadTimeout = PORT_READ_TIMEOUT;
                                     serialPort.WriteTimeout = PORT_WRITE_TIMEOUT;
@@ -64,6 +64,7 @@ namespace thermal_printer_client
                                 }
                                 else
                                 {
+                                    Console.WriteLine("Port is open");
                                     throw new Exception(string.Format("Serial port {0} is already in use by another program.", LP_50_PORT));
                                 }
                             }
@@ -116,13 +117,13 @@ namespace thermal_printer_client
                 FileStream f = new FileStream(filePath, FileMode.Open, FileAccess.Read);
                 streamReader = new StreamReader(f);
 
-                CsvConfiguration config = new CsvConfiguration();
-                config.Delimiter = ",";
-                config.HasHeaderRecord = false;
-                config.TrimFields = true;
+                var config = new CsvConfiguration(System.Globalization.CultureInfo.InvariantCulture)
+                {
+                    HasHeaderRecord = false,
+                };
                 CsvReader csvReader = new CsvReader(streamReader, config);
                 while (csvReader.Read())
-                    values.AddRange(new List<String>(csvReader.CurrentRecord));
+                    values.AddRange(new List<String>(csvReader.GetRecords<String>()));
 
                 return values;
             }
@@ -229,7 +230,7 @@ namespace thermal_printer_client
         {
             Console.WriteLine("Reading printer response...");
             this.FlushPortBuffers(port);
-            SerialPortTimer timer = new SerialPortTimer();
+            SerialTimer timer = new SerialTimer();
             timer.Start(timeout);
 
             while (port.BytesToRead == 0 && !timer.timedout) ; //wait for inbound buffer until timeout
