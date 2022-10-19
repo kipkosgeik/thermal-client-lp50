@@ -38,8 +38,8 @@ namespace ThermalPrinter
                     Program bridge = new Program();
                     Console.WriteLine("Reading file {0}...", args[0]);
                     List<string> variables = bridge.ReadValues(args[0]);
-                    Console.WriteLine("Acquired data: {0}", string.Join(" ", variables.ToArray()));
-                    string LP_50_PORT = "COM8"; //fetch port from config
+                    Console.WriteLine("Acquired data: {0}", string.Join(",", variables.ToArray()));
+                    string LP_50_PORT = "COM5"; //fetch port from config
                     Console.WriteLine("Configured port is {0}", LP_50_PORT);
                     List<String> ports = bridge.getAllPorts();
                     Console.WriteLine("Enumerating available ports...");
@@ -60,7 +60,8 @@ namespace ThermalPrinter
                                     serialPort.ReadTimeout = PORT_READ_TIMEOUT;
                                     serialPort.WriteTimeout = PORT_WRITE_TIMEOUT;
                                     Console.WriteLine("Communicating through {0}", port);
-                                    bridge.ConverseWithPrinter(serialPort, variables[0], variables.GetRange(2, int.Parse(variables[1])));
+                                    Console.WriteLine("Element count: {0}",  variables.Count());
+                                    bridge.ConverseWithPrinter(serialPort, variables[0], variables.GetRange(1, variables.Count() - 1));
                                 }
                                 else
                                 {
@@ -113,18 +114,31 @@ namespace ThermalPrinter
             try
             {
                 List<string> values = new List<string>();
-
-                FileStream f = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-                streamReader = new StreamReader(f);
+                Console.WriteLine("Reading data {0}", filePath);
 
                 var config = new CsvConfiguration(System.Globalization.CultureInfo.InvariantCulture)
                 {
                     HasHeaderRecord = false,
+                    Encoding = Encoding.UTF8, // Our file uses UTF-8 encoding.
+                    Delimiter = "," // The delimiter is a comma.
                 };
-                CsvReader csvReader = new CsvReader(streamReader, config);
-                while (csvReader.Read())
-                    values.AddRange(new List<String>(csvReader.GetRecords<String>()));
 
+                using (var fs = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    using (var textReader = new StreamReader(fs, Encoding.UTF8))
+                    using (var csv = new CsvReader(textReader, config))
+                    {
+                        // csv.Read();
+                        var data = csv.GetRecords<string>();
+                        string value;
+                        while(csv.Read()) {
+                            for(int i=0; csv.TryGetField<string>(i, out value); i++) {
+                                Console.WriteLine("Item = {0}", value);
+                                values.Add(value);
+                            }
+                        }
+                    }
+                }
                 return values;
             }
             catch (Exception e)
@@ -147,10 +161,12 @@ namespace ThermalPrinter
         public List<string> getAllPorts()
         {
             List<String> allPorts = new List<String>();
+            
             foreach (String portName in System.IO.Ports.SerialPort.GetPortNames())
             {
                 allPorts.Add(portName);
             }
+            Console.WriteLine("Available ports = {0}", string.Join(",", allPorts.ToArray()));
             return allPorts;
         }
 
@@ -169,6 +185,7 @@ namespace ThermalPrinter
 
                 //Read installed forms in printer memory and confirm if required form is available
                 //Us UF command to list forms
+                Console.WriteLine("Reading available forms...");
                 port.WriteLine("UF");
                 List<String> forms = ReadPortResponse(port, PORT_READ_TIMEOUT * 2, true);
                 //forms are listed starting with the form count as first item e.g
@@ -176,6 +193,7 @@ namespace ThermalPrinter
                 //L0
                 //L1
                 //means there are 2 forms named L0,L1
+                Console.WriteLine("Available forms: {0}", string.Join(",", forms.ToArray()));
                 bool targetFormAvailable = false;
                 foreach (string form in forms)
                 {
